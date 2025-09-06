@@ -68,7 +68,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{ paddingTop: '6rem' }}>
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ paddingTop: '7.5rem' }}>
       <div className="max-w-md w-full mx-auto bg-white p-6 rounded shadow animate-fade-in">
         <h2 className="text-xl font-semibold mb-4">Profile</h2>
         <div className="space-y-3">
@@ -77,16 +77,19 @@ export default function Profile() {
             {avatarPreview ? <img src={avatarPreview} alt="avatar" className="w-full h-full object-cover" /> : <div className="text-gray-400">No avatar</div>}
           </div>
           <div>
-            <label className="block text-sm">Change avatar</label>
-            <input type="file" accept="image/*" onChange={e => {
-              const f = e.target.files && e.target.files[0]
-              setFile(f)
-              if (f) {
-                // revoke previous object URL if any
-                try { if (avatarPreview && avatarPreview.startsWith('blob:')) URL.revokeObjectURL(avatarPreview) } catch (err) {}
-                setAvatarPreview(URL.createObjectURL(f))
-              }
-            }} />
+            <label className="block text-sm mb-1">Change avatar</label>
+            <label className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 border rounded cursor-pointer text-sm">
+              <span>Choose file</span>
+              <input aria-label="Change avatar" type="file" accept="image/*" className="hidden" onChange={e => {
+                const f = e.target.files && e.target.files[0]
+                setFile(f)
+                if (f) {
+                  // revoke previous object URL if any
+                  try { if (avatarPreview && avatarPreview.startsWith('blob:')) URL.revokeObjectURL(avatarPreview) } catch (err) {}
+                  setAvatarPreview(URL.createObjectURL(f))
+                }
+              }} />
+            </label>
           </div>
         </div>
         <div>

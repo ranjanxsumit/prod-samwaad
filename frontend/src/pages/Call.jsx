@@ -264,26 +264,28 @@ export default function Call() {
   }
 
   return (
-    <div className="p-6">
-      <h2 className="text-xl mb-4">Call with {id} ({mode})</h2>
-      <div className="grid grid-cols-2 gap-4">
-  <video ref={localRef} autoPlay playsInline muted className="w-full bg-black h-60 rounded" />
-  <video ref={remoteRef} autoPlay playsInline className="w-full bg-black h-60 rounded" />
-      </div>
-      <div className="mt-4 flex gap-2">
-        <button onClick={ensureLocalStream} className="bg-green-600 text-white px-4 py-2 rounded">Start Local</button>
-        <button onClick={() => { if (localStream) { localStream.getAudioTracks().forEach(t=>t.enabled = !t.enabled) } }} className="bg-yellow-600 text-white px-4 py-2 rounded">Toggle Audio</button>
-        <button onClick={hangup} className="bg-red-600 text-white px-4 py-2 rounded">Hang up</button>
-      </div>
-      <div className="mt-3 text-sm text-gray-500">Status: {connected ? 'connected' : 'not connected'}</div>
-      <div className="mt-4">
-        <div className="text-sm font-semibold mb-2">Debug</div>
-        <div className="text-xs mb-2">pc: {pcState} · ice: {iceState} · local ICE: {localIceCount} · remote ICE: {remoteIceCount}</div>
-        <div className="text-xs mb-2">localSDP: {localSdp ? <span className="font-mono">{localSdp}</span> : <em className="text-gray-400">(none)</em>}</div>
-        <div className="text-xs mb-2">remoteSDP: {remoteSdp ? <span className="font-mono">{remoteSdp}</span> : <em className="text-gray-400">(none)</em>}</div>
-        <div className="h-40 overflow-auto bg-gray-50 p-2 rounded text-xs font-mono">
-          {logs.length === 0 && <div className="text-gray-400">no logs yet</div>}
-          {logs.map((l,i) => <div key={i}>{l}</div>)}
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ paddingTop: '6rem' }}>
+      <div className="w-full max-w-4xl bg-white rounded shadow p-6">
+        <h2 className="text-xl mb-4 text-center">Call with {id} ({mode})</h2>
+        <div className="flex flex-col md:flex-row items-center md:items-stretch gap-4 justify-center">
+          <video ref={localRef} autoPlay playsInline muted className="w-full md:w-1/2 bg-black h-60 rounded" />
+          <video ref={remoteRef} autoPlay playsInline className="w-full md:w-1/2 bg-black h-60 rounded" />
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2 justify-center">
+          <button onClick={ensureLocalStream} className="bg-green-600 text-white px-4 py-2 rounded">Start Local</button>
+          <button onClick={() => { if (localStream) { localStream.getAudioTracks().forEach(t=>t.enabled = !t.enabled) } }} className="bg-yellow-600 text-white px-4 py-2 rounded">Toggle Audio</button>
+          <button onClick={hangup} className="bg-red-600 text-white px-4 py-2 rounded">Hang up</button>
+        </div>
+        <div className="mt-3 text-sm text-gray-500 text-center">Status: {connected ? 'connected' : 'not connected'}</div>
+        <div className="mt-4">
+          <div className="text-sm font-semibold mb-2">Debug</div>
+          <div className="text-xs mb-2">pc: {pcState} · ice: {iceState} · local ICE: {localIceCount} · remote ICE: {remoteIceCount}</div>
+          <div className="text-xs mb-2">localSDP: {localSdp ? <span className="font-mono">{localSdp}</span> : <em className="text-gray-400">(none)</em>}</div>
+          <div className="text-xs mb-2">remoteSDP: {remoteSdp ? <span className="font-mono">{remoteSdp}</span> : <em className="text-gray-400">(none)</em>}</div>
+          <div className="h-40 overflow-auto bg-gray-50 p-2 rounded text-xs font-mono">
+            {logs.length === 0 && <div className="text-gray-400">no logs yet</div>}
+            {logs.map((l,i) => <div key={i}>{l}</div>)}
+          </div>
         </div>
       </div>
     </div>
