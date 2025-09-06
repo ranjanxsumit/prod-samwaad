@@ -255,10 +255,9 @@ export default function Chat() {
       `}</style>
   {/* Floating user pill removed — merged into Nav.jsx pill */}
   {/* Re-add floating user pill (avatar + name + actions) */}
-  <div className="fixed inset-x-0 top-6" style={{ zIndex: 60 }}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 flex justify-center md:justify-end">
-  <div className="w-full max-w-3xl flex justify-end pr-8">
-          <div className="inline-flex items-center justify-between gap-4 bg-white/95 backdrop-blur-sm text-gray-900 rounded-full px-4 py-2 shadow-md min-w-[340px] max-w-[520px] w-full transition-transform duration-200">
+  <div className="fixed inset-x-0 top-6 flex justify-center" style={{ zIndex: 60 }}>
+    <div className="w-full max-w-3xl px-4">
+      <div className="inline-flex items-center justify-center gap-4 bg-white/95 backdrop-blur-sm text-gray-900 rounded-full px-4 py-2 shadow-md min-w-[280px] max-w-[520px] w-full transition-transform duration-200">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full overflow-hidden">
                 {selectedUser && normalizeAvatar(selectedUser.avatar) ? <img src={normalizeAvatar(selectedUser.avatar)} alt="avatar" className="w-full h-full object-cover" /> : (selectedUser && selectedUser.name ? selectedUser.name[0].toUpperCase() : 'U')}
@@ -310,8 +309,8 @@ export default function Chat() {
               >📞</button>
             </div>
           </div>
-          </div>
         </div>
+  </div>
         {/* incoming call prompt */}
         {incomingCall && (
           <div className="fixed left-1/2 transform -translate-x-1/2 top-28 z-60">
@@ -334,10 +333,10 @@ export default function Chat() {
               </div>
             </div>
           </div>
-        )}
-      </div>
+    )}
 
-  <div className="max-w-6xl mx-auto h-full grid grid-cols-12 gap-4 bg-white rounded-md shadow p-4" style={{ paddingTop: '6rem' }}>
+  <div className="fixed inset-0 flex items-start justify-center p-4">
+    <div className="w-full max-w-6xl h-full grid grid-cols-12 gap-4 bg-white rounded-md shadow p-4 overflow-hidden" style={{ paddingTop: '4rem' }}>
         {/* Sidebar */}
   <aside className="col-span-12 md:col-span-4 lg:col-span-4 bg-white border-r overflow-auto h-full">
             <div className="p-4 border-b">
@@ -509,6 +508,7 @@ export default function Chat() {
         </main>
       </div>
     </div>
+  </div>
   )
 }
 
