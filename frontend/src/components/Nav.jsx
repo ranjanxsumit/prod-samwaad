@@ -120,6 +120,7 @@ export default function Nav({ user, onLogout }) {
             {/* Profile pill (click to open user menu) */}
             <div className="relative hidden sm:block">
               <button
+                type="button"
                 onClick={() => setUserMenuOpen(s => !s)}
                 aria-haspopup="menu"
                 aria-expanded={userMenuOpen}
@@ -127,7 +128,7 @@ export default function Nav({ user, onLogout }) {
                 aria-label="Profile menu"
                 className="flex items-center gap-3 px-3 py-2 rounded-full hover:shadow-md hover:bg-indigo-50 transition-all"
               >
-                <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-sm font-semibold text-indigo-700 overflow-hidden" title={user?.name || 'Profile'} onClick={() => { try { setUserMenuOpen(false); navigate('/profile') } catch(e){} }}>
+                <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-sm font-semibold text-indigo-700 overflow-hidden" title={user?.name || 'Profile'}>
                   {normalizeAvatar(avatarOf(user)) ? (
                     <img src={normalizeAvatar(avatarOf(user))} alt="profile" className="w-full h-full object-cover" />
                   ) : (
