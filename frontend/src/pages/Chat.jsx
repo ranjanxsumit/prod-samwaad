@@ -25,6 +25,7 @@ export default function Chat() {
 
   const scrollRef = useRef()
   const fileInputRef = useRef()
+  const textInputRef = useRef()
 
   // helper to extract id from different shapes and always return a string (or undefined)
   const getId = (v) => {
@@ -446,7 +447,15 @@ export default function Chat() {
               <div className="w-full max-w-3xl relative flex items-center justify-end">
                 <div className="flex items-center gap-2 bg-white rounded-full px-4 py-3 shadow-md w-full">
                   <div className="flex items-center gap-2 px-2">
-                    <button onClick={() => { /* emoji placeholder */ }} className="p-2 text-xl">😊</button>
+                    <button onClick={() => {
+                      try {
+                        const emoji = '😊'
+                        setText(t => (t || '') + emoji)
+                        if (textInputRef.current) {
+                          textInputRef.current.focus()
+                        }
+                      } catch(e) { console.warn('emoji insert', e) }
+                    }} className="p-2 text-xl" title="Insert emoji">😊</button>
                     <button onClick={onPickFile} className="p-2 text-xl">📎</button>
                     <input ref={fileInputRef} type="file" accept="image/*" onChange={onFileChange} className="hidden" />
                   </div>
@@ -461,6 +470,7 @@ export default function Chat() {
                       </div>
                     )}
                   <input
+                    ref={textInputRef}
                     value={text}
                     onChange={e => setText(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') send() }}

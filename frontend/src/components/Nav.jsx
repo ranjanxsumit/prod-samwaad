@@ -108,7 +108,7 @@ export default function Nav({ user, onLogout }) {
             aria-hidden="false"
           >
             {/* Brand logo + tagline inside pill */}
-            <Link to="/" className="flex items-center gap-3 px-2 py-1 rounded-full" aria-label="Go to home">
+            <a href="https://prod-samwaad.onrender.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-2 py-1 rounded-full" aria-label="Open production site">
               <div className="w-11 h-11 rounded-full overflow-hidden bg-white flex items-center justify-center shadow-sm">
                 <img src="/samwaad.svg" alt="Samwaad logo" className="w-full h-full object-cover" onError={(e)=>{ try{ e.target.onerror=null; e.target.src='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="%236366F1"/><path d="M8 12c1.333-2 3-3 4-3s2.667 1 4 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 15c1.333-1.333 3-2 4-2s2.667.667 4 2" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' } catch(e){} }} />
               </div>
@@ -116,7 +116,7 @@ export default function Nav({ user, onLogout }) {
                 <div className="text-sm font-semibold text-indigo-600">Samwaad</div>
                 <div className="text-xs text-gray-400">Real-time chat & calls</div>
               </div>
-            </Link>
+            </a>
             {/* Profile pill (click to open user menu) */}
             <div className="relative hidden sm:block">
               <button
@@ -127,7 +127,7 @@ export default function Nav({ user, onLogout }) {
                 aria-label="Profile menu"
                 className="flex items-center gap-3 px-3 py-2 rounded-full hover:shadow-md hover:bg-indigo-50 transition-all"
               >
-                <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-sm font-semibold text-indigo-700 overflow-hidden">
+                <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-sm font-semibold text-indigo-700 overflow-hidden" title={user?.name || 'Profile'} onClick={() => { try { setUserMenuOpen(false); navigate('/profile') } catch(e){} }}>
                   {normalizeAvatar(avatarOf(user)) ? (
                     <img src={normalizeAvatar(avatarOf(user))} alt="profile" className="w-full h-full object-cover" />
                   ) : (
