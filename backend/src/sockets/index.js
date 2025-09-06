@@ -27,6 +27,17 @@ const socketHandler = (io) => {
     user.status = 'online';
     await user.save();
     io.emit('user-online', { userId: user._id.toString(), name: user.name, avatar: user.avatar });
+    // emit a full online-users list to the newly connected socket so it can sync immediately
+    try {
+      const presences = await Presence.find({ online: true }).lean()
+      const ids = Array.from(new Set(presences.map(p => p.userId.toString())))
+      const users = await User.find({ _id: { $in: ids } }).select('name avatar').lean()
+      const byId = users.reduce((acc, u) => { acc[u._id.toString()] = u; return acc }, {})
+      const out = ids.map(id => ({ userId: id, name: byId[id]?.name || null, avatar: byId[id]?.avatar || null }))
+      try { socket.emit('online-users', out) } catch (e) { /* ignore emit errors */ }
+    } catch (e) {
+      console.warn('failed to emit online-users on connect', e && e.message)
+    }
   // join a private room for this user so we can target messages
   try { socket.join(user._id.toString()) } catch (e) { /* ignore */ }
 
@@ -133,6 +144,20 @@ const socketHandler = (io) => {
         io.emit('user-offline', { userId: user._id.toString(), lastSeen: user.lastSeen });
       }
     });
+
+    // respond to explicit client requests for online users
+    socket.on('request-online-users', async () => {
+      try {
+        const presences = await Presence.find({ online: true }).lean()
+        const ids = Array.from(new Set(presences.map(p => p.userId.toString())))
+        const users = await User.find({ _id: { $in: ids } }).select('name avatar').lean()
+        const byId = users.reduce((acc, u) => { acc[u._id.toString()] = u; return acc }, {})
+        const out = ids.map(id => ({ userId: id, name: byId[id]?.name || null, avatar: byId[id]?.avatar || null }))
+        try { socket.emit('online-users', out) } catch (e) { /* ignore */ }
+      } catch (err) {
+        console.warn('request-online-users error', err && err.message)
+      }
+    })
   });
 };
 
