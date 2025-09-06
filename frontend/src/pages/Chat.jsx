@@ -239,7 +239,7 @@ export default function Chat() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="min-h-screen bg-gray-50 text-gray-900 overflow-hidden">
       <style>{`
   .chat-bubble { position: relative; border-radius: 12px; }
   .chat-bubble.sent { background: linear-gradient(180deg,#06a763,#0da96a); color: #fff; }
@@ -279,7 +279,17 @@ export default function Chat() {
     )}
 
   <div className="fixed inset-0 flex items-start justify-center p-4">
-    <div className="w-full max-w-6xl h-full grid grid-cols-12 gap-4 bg-white rounded-md shadow p-4 overflow-hidden" style={{ paddingTop: '4rem' }}>
+    <div className="w-full max-w-6xl h-[calc(100vh-2rem)] grid grid-cols-12 gap-4 bg-white rounded-md shadow p-4 overflow-hidden relative" style={{ paddingTop: '4rem' }}>
+      {/* App logo + admin pill in top-left of white block */}
+      <div className="absolute top-4 left-4 z-30 flex items-center gap-3">
+        <img src="/samwaad.svg" alt="app logo" className="w-10 h-10" />
+        <div className="inline-flex items-center gap-2 bg-white rounded-full px-3 py-1 shadow-sm">
+          <div className="w-8 h-8 rounded-full overflow-hidden bg-indigo-500 text-white flex items-center justify-center">
+            {user && normalizeAvatar(user.avatar) ? <img src={normalizeAvatar(user.avatar)} alt="me" className="w-full h-full object-cover" /> : (user && user.name ? user.name[0].toUpperCase() : 'A')}
+          </div>
+          <div className="text-sm font-medium">{user?.name || 'Admin'}</div>
+        </div>
+      </div>
         {/* Sidebar */}
   <aside className="col-span-12 md:col-span-4 lg:col-span-4 bg-white border-r overflow-auto h-full">
             <div className="p-4 border-b">
@@ -409,7 +419,7 @@ export default function Chat() {
                 </div>
               </div>
             </div>
-            <div ref={scrollRef} className="flex-1 overflow-auto p-6 min-h-[60vh]" style={{ backgroundImage: 'radial-gradient(rgba(0,0,0,0.02) 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
+            <div ref={scrollRef} className="flex-1 overflow-auto p-6 min-h-0" style={{ backgroundImage: 'radial-gradient(rgba(0,0,0,0.02) 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
               <div className="max-w-3xl mx-auto flex flex-col gap-4">
               {messages.map((m, i) => {
                 const fromId = getId(m.from || m.sender || m.fromId)
