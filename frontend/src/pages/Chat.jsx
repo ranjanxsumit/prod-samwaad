@@ -42,12 +42,12 @@ export default function Chat() {
     try {
       if (!socket) return console.warn('socket not available for emit', event)
       if (socket.connected) {
-        try { socket.emit(event, payload) } catch (e) { console.warn('emit error', event, e) }
+        try { console.log('emit immediate', event, payload, 'socketId', socket.id); socket.emit(event, payload) } catch (e) { console.warn('emit error', event, e) }
         return
       }
       // wait for a single connect then emit
       const once = () => {
-        try { socket.emit(event, payload) } catch (e) { console.warn('emit-on-connect error', event, e) }
+        try { console.log('emit on connect', event, payload, 'socketId', socket.id); socket.emit(event, payload) } catch (e) { console.warn('emit-on-connect error', event, e) }
         try { socket.off('connect', once) } catch (e) {}
       }
       try { socket.on('connect', once) } catch (e) { console.warn('failed to attach connect handler', e) }
