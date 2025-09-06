@@ -37,6 +37,22 @@ export default function Chat() {
     if (!candidate && candidate !== 0) return undefined
     return String(candidate)
   }
+  // emit helper: if socket is connected emit immediately, otherwise wait for connect event
+  const emitWhenConnected = (event, payload) => {
+    try {
+      if (!socket) return console.warn('socket not available for emit', event)
+      if (socket.connected) {
+        try { socket.emit(event, payload) } catch (e) { console.warn('emit error', event, e) }
+        return
+      }
+      // wait for a single connect then emit
+      const once = () => {
+        try { socket.emit(event, payload) } catch (e) { console.warn('emit-on-connect error', event, e) }
+        try { socket.off('connect', once) } catch (e) {}
+      }
+      try { socket.on('connect', once) } catch (e) { console.warn('failed to attach connect handler', e) }
+    } catch (e) { console.warn('emitWhenConnected error', e) }
+  }
   const currentUserId = getId(user)
 
   const avatarOf = (u) => u && (u.avatar || u.avatarUrl || u.image || u.photo || u.avatar_url)
@@ -210,7 +226,7 @@ export default function Chat() {
                   try {
                     // mark pending accept so Call page will emit accept once local media is ready
                     try { localStorage.setItem('pendingCallAccept', incomingCall.from) } catch (err) { /* ignore */ }
-                    if (socket && socket.connected) socket.emit('call-accept', { to: incomingCall.from })
+                    try { emitWhenConnected('call-accept', { to: incomingCall.from }) } catch (e) { console.warn(e) }
                   } catch (e) { console.warn(e) }
                   try { nav(`/call/${incomingCall.from}?mode=${incomingCall.mode || 'video'}`) } catch (e) { console.warn(e) }
                   setIncomingCall(null)
@@ -254,23 +270,23 @@ export default function Chat() {
                 <div className="text-base font-semibold">{selectedUser ? selectedUser.name : 'Select a chat'}</div>
               </div>
               <div className="ml-auto flex items-center gap-2 flex-shrink-0">
-                <button
+        <button
                   title="Video call"
                   onClick={() => {
                     if (!selectedUser) return
                     const targetId = selectedUser.userId
-                    try { if (socket && socket.connected) socket.emit('call-init', { to: targetId, mode: 'video' }) } catch (e) { console.warn('call-init emit', e) }
-                    try { nav(`/call/${targetId}?mode=video`) } catch (e) { console.warn('nav', e) }
+          try { emitWhenConnected('call-init', { to: targetId, mode: 'video' }) } catch (e) { console.warn('call-init emit', e) }
+          try { nav(`/call/${targetId}?mode=video`) } catch (e) { console.warn('nav', e) }
                   }}
                   className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center"
                 >📹</button>
-                <button
+        <button
                   title="Voice call"
                   onClick={() => {
                     if (!selectedUser) return
                     const targetId = selectedUser.userId
-                    try { if (socket && socket.connected) socket.emit('call-init', { to: targetId, mode: 'audio' }) } catch (e) { console.warn('call-init emit', e) }
-                    try { nav(`/call/${targetId}?mode=audio`) } catch (e) { console.warn('nav', e) }
+          try { emitWhenConnected('call-init', { to: targetId, mode: 'audio' }) } catch (e) { console.warn('call-init emit', e) }
+          try { nav(`/call/${targetId}?mode=audio`) } catch (e) { console.warn('nav', e) }
                   }}
                   className="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center"
                 >📞</button>
