@@ -26,6 +26,8 @@ export default function Chat() {
   const scrollRef = useRef()
   const fileInputRef = useRef()
   const textInputRef = useRef()
+  const adminMenuRef = useRef()
+  const [adminMenuOpen, setAdminMenuOpen] = useState(false)
 
   // helper to extract id from different shapes and always return a string (or undefined)
   const getId = (v) => {
@@ -162,6 +164,18 @@ export default function Chat() {
 
   useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight }, [messages])
 
+  // close admin menu on outside click / Escape
+  useEffect(() => {
+    function onDoc(e) {
+      if (!adminMenuRef.current) return
+      if (!adminMenuRef.current.contains(e.target)) setAdminMenuOpen(false)
+    }
+    function onEsc(e) { if (e.key === 'Escape') setAdminMenuOpen(false) }
+    document.addEventListener('click', onDoc)
+    document.addEventListener('keydown', onEsc)
+    return () => { document.removeEventListener('click', onDoc); document.removeEventListener('keydown', onEsc) }
+  }, [])
+
   function relativeTime(ts) {
     if (!ts) return ''
     const d = new Date(ts)
@@ -279,15 +293,24 @@ export default function Chat() {
     )}
 
   <div className="fixed inset-0 flex items-start justify-center p-4">
-    <div className="w-full max-w-6xl h-[calc(100vh-2rem)] grid grid-cols-12 gap-4 bg-white rounded-md shadow p-4 overflow-hidden relative" style={{ paddingTop: '4rem' }}>
+  <div className="w-full max-w-6xl h-[calc(100vh-2rem)] grid grid-cols-12 gap-4 bg-white rounded-md shadow p-4 overflow-hidden relative" style={{ paddingTop: '4rem' }}>
       {/* App logo + admin pill in top-left of white block */}
-      <div className="absolute top-4 left-4 z-30 flex items-center gap-3">
+      <div className="absolute top-4 left-4 z-30 flex items-center gap-3" ref={adminMenuRef}>
         <img src="/samwaad.svg" alt="app logo" className="w-10 h-10" />
-        <div className="inline-flex items-center gap-2 bg-white rounded-full px-3 py-1 shadow-sm">
-          <div className="w-8 h-8 rounded-full overflow-hidden bg-indigo-500 text-white flex items-center justify-center">
-            {user && normalizeAvatar(user.avatar) ? <img src={normalizeAvatar(user.avatar)} alt="me" className="w-full h-full object-cover" /> : (user && user.name ? user.name[0].toUpperCase() : 'A')}
-          </div>
-          <div className="text-sm font-medium">{user?.name || 'Admin'}</div>
+        <div className="relative">
+          <button onClick={(e) => { e.stopPropagation(); setAdminMenuOpen(s => !s) }} className="inline-flex items-center gap-2 bg-white rounded-full px-3 py-1 shadow-sm focus:outline-none">
+            <div className="w-8 h-8 rounded-full overflow-hidden bg-indigo-500 text-white flex items-center justify-center">
+              {user && normalizeAvatar(user.avatar) ? <img src={normalizeAvatar(user.avatar)} alt="me" className="w-full h-full object-cover" /> : (user && user.name ? user.name[0].toUpperCase() : 'A')}
+            </div>
+            <div className="text-sm font-medium">{user?.name || 'Admin'}</div>
+          </button>
+          {adminMenuOpen && (
+            <div role="menu" className="absolute left-0 mt-2 w-44 bg-white rounded shadow-lg ring-1 ring-black ring-opacity-5 py-2 z-50">
+              <button onClick={() => { setAdminMenuOpen(false); nav('/profile') }} className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50">View / Update profile</button>
+              <button onClick={() => { setAdminMenuOpen(false); nav('/profile') }} className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50">Change display picture</button>
+              <button onClick={() => { setAdminMenuOpen(false); localStorage.removeItem('token'); localStorage.removeItem('user'); localStorage.removeItem('tokenExpiry'); window.location.href = '/' }} className="block w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-50">Logout</button>
+            </div>
+          )}
         </div>
       </div>
         {/* Sidebar */}
@@ -356,8 +379,8 @@ export default function Chat() {
           </ul>
         </aside>
 
-        {/* Main chat */}
-        <main className="col-span-12 md:col-span-8 lg:col-span-8 flex flex-col min-h-0" style={{ maxHeight: 'calc(100vh - 14rem)', margin: '1rem auto' }}>
+  {/* Main chat */}
+  <main className="col-span-12 md:col-span-8 lg:col-span-8 flex flex-col min-h-0 h-full" style={{ margin: '1rem auto' }}>
           {/* Header spacer for new header */}
           <div className="h-16" />
 

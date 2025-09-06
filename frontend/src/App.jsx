@@ -57,7 +57,7 @@ export default function App() {
   const user = useSelector(s => s.auth.user)
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-transparent">
   <HeaderSimple />
   <SocketProvider>
   <div className="p-4 sm:p-6 max-w-6xl mx-auto">
