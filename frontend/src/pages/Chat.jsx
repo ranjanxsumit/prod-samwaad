@@ -253,64 +253,7 @@ export default function Chat() {
         .max-w-chat { max-width: 560px; }
         @media (max-width: 640px) { .max-w-chat { max-width: 90%; } }
       `}</style>
-  {/* Floating user pill removed — merged into Nav.jsx pill */}
-  {/* Re-add floating user pill (avatar + name + actions) */}
-  <div className="fixed inset-x-0 top-6 flex justify-center" style={{ zIndex: 60 }}>
-    <div className="w-full max-w-3xl px-4">
-      <div className="inline-flex items-center justify-center gap-4 bg-white/95 backdrop-blur-sm text-gray-900 rounded-full px-4 py-2 shadow-md min-w-[280px] max-w-[520px] w-full transition-transform duration-200">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full overflow-hidden">
-                {selectedUser && normalizeAvatar(selectedUser.avatar) ? <img src={normalizeAvatar(selectedUser.avatar)} alt="avatar" className="w-full h-full object-cover" /> : (selectedUser && selectedUser.name ? selectedUser.name[0].toUpperCase() : 'U')}
-              </div>
-              <div className="text-base font-semibold">{selectedUser ? selectedUser.name : 'Select a chat'}</div>
-            </div>
-            <div className="ml-auto flex items-center gap-2 flex-shrink-0">
-              {
-                // helper to initiate a call with the given mode ('video' or 'audio')
-              }
-              <button
-                title="Video call"
-                aria-label="Start video call"
-                onClick={(e) => {
-                  e.preventDefault()
-                  try {
-                    const myId = getId(user)
-                    const targetId = selectedUser && selectedUser.userId
-                    const canCall = !!targetId && String(myId) !== String(targetId)
-                    if (!canCall) return
-                    if (socket && socket.connected) {
-                      try { socket.emit('call-init', { to: targetId, mode: 'video' }) } catch (emitErr) { console.warn('emit error', emitErr) }
-                    }
-                    try { nav(`/call/${targetId}?mode=video`) } catch (navErr) { console.warn('navigation error', navErr) }
-                  } catch (err) { console.warn('video call error', err) }
-                }}
-                disabled={!selectedUser || !selectedUser.userId || String(getId(user)) === String(selectedUser.userId)}
-                className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm text-base ${(!selectedUser || !selectedUser.userId || String(getId(user)) === String(selectedUser.userId)) ? 'opacity-50' : 'bg-gray-100 text-gray-700'}`}
-              >📹</button>
-
-              <button
-                title="Voice call"
-                aria-label="Start voice call"
-                onClick={(e) => {
-                  e.preventDefault()
-                  try {
-                    const myId = getId(user)
-                    const targetId = selectedUser && selectedUser.userId
-                    const canCall = !!targetId && String(myId) !== String(targetId)
-                    if (!canCall) return
-                    if (socket && socket.connected) {
-                      try { socket.emit('call-init', { to: targetId, mode: 'audio' }) } catch (emitErr) { console.warn('emit error', emitErr) }
-                    }
-                    try { nav(`/call/${targetId}?mode=audio`) } catch (navErr) { console.warn('navigation error', navErr) }
-                  } catch (err) { console.warn('voice call error', err) }
-                }}
-                disabled={!selectedUser || !selectedUser.userId || String(getId(user)) === String(selectedUser.userId)}
-                className={`w-10 h-10 ${(!selectedUser || !selectedUser.userId || String(getId(user)) === String(selectedUser.userId)) ? 'opacity-50' : 'bg-pink-50 text-pink-600'} rounded-full flex items-center justify-center shadow-sm text-base`}
-              >📞</button>
-            </div>
-          </div>
-        </div>
-  </div>
+  {/* top floating pill removed; pill will appear inside online-users strip */}
         {/* incoming call prompt */}
         {incomingCall && (
           <div className="fixed left-1/2 transform -translate-x-1/2 top-28 z-60">
@@ -411,19 +354,59 @@ export default function Chat() {
           {/* Messages + online strip */}
           <div className="w-full">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8">
-              <div className="flex items-center gap-3 overflow-auto py-2">
-                {onlineUsers.length === 0 && <div className="text-sm text-gray-500">No online users</div>}
-                {onlineUsers.map(u => {
-                  const uid = getId(u) || u.userId || ''
-                  return (
-                    <button key={uid} onClick={() => setSelectedUser({ userId: uid, name: u.name, avatar: avatarOf(u) })} className="flex flex-col items-center gap-1 px-2 py-1 hover:bg-gray-50 rounded">
-                      <div className="w-12 h-12 rounded-full bg-indigo-500 text-white flex items-center justify-center overflow-hidden">
-                        {normalizeAvatar(avatarOf(u)) ? <img src={normalizeAvatar(avatarOf(u))} alt="avatar" className="w-full h-full object-cover" /> : (u.name ? u.name[0].toUpperCase() : '?')}
+              <div className="flex items-center gap-3 overflow-auto py-2 justify-center">
+                {/* Replace small avatar strip with the centered user pill bar */}
+                <div className="w-full max-w-3xl px-4">
+                  <div className="inline-flex items-center justify-center gap-4 bg-white/95 backdrop-blur-sm text-gray-900 rounded-full px-4 py-2 shadow-md min-w-[280px] max-w-[720px] w-full transition-transform duration-200">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full overflow-hidden">
+                        {selectedUser && normalizeAvatar(selectedUser.avatar) ? <img src={normalizeAvatar(selectedUser.avatar)} alt="avatar" className="w-full h-full object-cover" /> : (selectedUser && selectedUser.name ? selectedUser.name[0].toUpperCase() : 'U')}
                       </div>
-                      <div className="text-xs text-center truncate w-16">{u.name}</div>
-                    </button>
-                  )
-                })}
+                      <div className="text-base font-semibold">{selectedUser ? selectedUser.name : 'Select a chat'}</div>
+                    </div>
+                    <div className="ml-auto flex items-center gap-2 flex-shrink-0">
+                      <button
+                        title="Video call"
+                        aria-label="Start video call"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          try {
+                            const myId = getId(user)
+                            const targetId = selectedUser && selectedUser.userId
+                            const canCall = !!targetId && String(myId) !== String(targetId)
+                            if (!canCall) return
+                            if (socket && socket.connected) {
+                              try { socket.emit('call-init', { to: targetId, mode: 'video' }) } catch (emitErr) { console.warn('emit error', emitErr) }
+                            }
+                            try { nav(`/call/${targetId}?mode=video`) } catch (navErr) { console.warn('navigation error', navErr) }
+                          } catch (err) { console.warn('video call error', err) }
+                        }}
+                        disabled={!selectedUser || !selectedUser.userId || String(getId(user)) === String(selectedUser.userId)}
+                        className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm text-base ${(!selectedUser || !selectedUser.userId || String(getId(user)) === String(selectedUser.userId)) ? 'opacity-50' : 'bg-gray-100 text-gray-700'}`}
+                      >📹</button>
+
+                      <button
+                        title="Voice call"
+                        aria-label="Start voice call"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          try {
+                            const myId = getId(user)
+                            const targetId = selectedUser && selectedUser.userId
+                            const canCall = !!targetId && String(myId) !== String(targetId)
+                            if (!canCall) return
+                            if (socket && socket.connected) {
+                              try { socket.emit('call-init', { to: targetId, mode: 'audio' }) } catch (emitErr) { console.warn('emit error', emitErr) }
+                            }
+                            try { nav(`/call/${targetId}?mode=audio`) } catch (navErr) { console.warn('navigation error', navErr) }
+                          } catch (err) { console.warn('voice call error', err) }
+                        }}
+                        disabled={!selectedUser || !selectedUser.userId || String(getId(user)) === String(selectedUser.userId)}
+                        className={`w-10 h-10 ${(!selectedUser || !selectedUser.userId || String(getId(user)) === String(selectedUser.userId)) ? 'opacity-50' : 'bg-pink-50 text-pink-600'} rounded-full flex items-center justify-center shadow-sm text-base`}
+                      >📞</button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <div ref={scrollRef} className="flex-1 overflow-auto p-6 min-h-[60vh]" style={{ backgroundImage: 'radial-gradient(rgba(0,0,0,0.02) 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
