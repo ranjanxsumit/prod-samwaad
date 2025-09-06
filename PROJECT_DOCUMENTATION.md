@@ -207,11 +207,6 @@ Validation (Zod) examples
 - Media constraints: default to { audio: true, video: { width: 1280, height: 720 } } but provide quality toggle.
 - File uploads: client-side validate file size and type before passing to server or Cloudinary.
 
-## Tests & QA
-- Unit: Zod validation, reducers, utility functions.
-- Integration: Auth flows, message persistence (in-memory Mongo or test DB), Socket.IO event handling.
-- E2E (optional): Cypress to automate login, sending message, uploading image, and initiating a call (two-browser tests).
-
 ## Local dev & quick-start (Windows PowerShell)
 Assumes separate frontend and backend folders. Replace as needed.
 
@@ -230,29 +225,6 @@ pnpm run dev
 ```
 Notes: Ensure `CLIENT_URL` and `CORS` match.
 
-## Deployment suggestions
-- Frontend: Vercel (static build from React). Use environment variables in Vercel dashboard.
-- Backend: Render / Railway / Heroku (or Docker container) with environment variables; attach a managed MongoDB Atlas instance and enable secure networking.
-- For TURN server, use a hosted TURN (e.g., Twilio, Coturn deployed in cloud) and secure credentials in env.
-
-## Observability & Monitoring
-- Logs: structured JSON logs on backend; include requestId and userId where available.
-- Metrics: track active connections, messages/sec, failed uploads.
-- Alerts: monitor 5xx rate and upload failure rate.
-
-## Scaling considerations
-- Socket.IO scaling: use Redis adapter to sync events across backend instances.
-- Media: use Cloudinary CDN to offload bandwidth.
-- Database: shard or create read replicas if traffic grows.
-
-## Sample UX flows
-- Signup -> verify -> redirect to chat -> presence list shows online users -> open chat with user -> send text or image -> start call -> exchange media.
-
-## Next steps I can implement (optional)
-- Generate NestJS backend skeleton with auth, user, messages modules and Socket.IO gateway.
-- Generate React frontend skeleton with routes, Redux slices, Socket.IO client and a simple UI with Tailwind.
-- Add example e2e Cypress test.
-
 ---
 
-Created by project documentation generator.
+Created by Sumit Ranjan
