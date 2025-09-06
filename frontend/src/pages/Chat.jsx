@@ -409,9 +409,26 @@ export default function Chat() {
           {/* Header spacer for new header */}
           <div className="h-16" />
 
-          {/* Messages */}
-          <div ref={scrollRef} className="flex-1 overflow-auto p-4 min-h-0" style={{ backgroundImage: 'radial-gradient(rgba(0,0,0,0.02) 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
-            <div className="max-w-3xl mx-auto flex flex-col gap-4">
+          {/* Messages + online strip */}
+          <div className="w-full">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8">
+              <div className="flex items-center gap-3 overflow-auto py-2">
+                {onlineUsers.length === 0 && <div className="text-sm text-gray-500">No online users</div>}
+                {onlineUsers.map(u => {
+                  const uid = getId(u) || u.userId || ''
+                  return (
+                    <button key={uid} onClick={() => setSelectedUser({ userId: uid, name: u.name, avatar: avatarOf(u) })} className="flex flex-col items-center gap-1 px-2 py-1 hover:bg-gray-50 rounded">
+                      <div className="w-12 h-12 rounded-full bg-indigo-500 text-white flex items-center justify-center overflow-hidden">
+                        {normalizeAvatar(avatarOf(u)) ? <img src={normalizeAvatar(avatarOf(u))} alt="avatar" className="w-full h-full object-cover" /> : (u.name ? u.name[0].toUpperCase() : '?')}
+                      </div>
+                      <div className="text-xs text-center truncate w-16">{u.name}</div>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+            <div ref={scrollRef} className="flex-1 overflow-auto p-6 min-h-[60vh]" style={{ backgroundImage: 'radial-gradient(rgba(0,0,0,0.02) 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
+              <div className="max-w-3xl mx-auto flex flex-col gap-4">
               {messages.map((m, i) => {
                 const fromId = getId(m.from || m.sender || m.fromId)
                 const toId = getId(m.to || m.recipient || m.toId)
@@ -439,6 +456,7 @@ export default function Chat() {
                 )
               })}
             </div>
+          </div>
           </div>
 
           {/* Input - right aligned within the same max-width container as the nav */}
