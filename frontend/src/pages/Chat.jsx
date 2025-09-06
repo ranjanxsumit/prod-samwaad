@@ -246,8 +246,26 @@ export default function Chat() {
                 <div className="text-base font-semibold">{selectedUser ? selectedUser.name : 'Select a chat'}</div>
               </div>
               <div className="ml-auto flex items-center gap-2 flex-shrink-0">
-                <button title="Video call" onClick={() => { if (!selectedUser) return; try { nav(`/call/${selectedUser.userId}?mode=video`) } catch (e) {} }} className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">📹</button>
-                <button title="Voice call" onClick={() => { if (!selectedUser) return; try { nav(`/call/${selectedUser.userId}?mode=audio`) } catch (e) {} }} className="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center">📞</button>
+                <button
+                  title="Video call"
+                  onClick={() => {
+                    if (!selectedUser) return
+                    const targetId = selectedUser.userId
+                    try { if (socket && socket.connected) socket.emit('call-init', { to: targetId, mode: 'video' }) } catch (e) { console.warn('call-init emit', e) }
+                    try { nav(`/call/${targetId}?mode=video`) } catch (e) { console.warn('nav', e) }
+                  }}
+                  className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center"
+                >📹</button>
+                <button
+                  title="Voice call"
+                  onClick={() => {
+                    if (!selectedUser) return
+                    const targetId = selectedUser.userId
+                    try { if (socket && socket.connected) socket.emit('call-init', { to: targetId, mode: 'audio' }) } catch (e) { console.warn('call-init emit', e) }
+                    try { nav(`/call/${targetId}?mode=audio`) } catch (e) { console.warn('nav', e) }
+                  }}
+                  className="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center"
+                >📞</button>
               </div>
               </div>
             </div>
