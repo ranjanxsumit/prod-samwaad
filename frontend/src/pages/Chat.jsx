@@ -205,10 +205,18 @@ export default function Chat() {
               <div className="font-medium">{incomingCall.name || 'Incoming call'}</div>
               <div className="text-sm text-gray-500">{incomingCall.mode === 'audio' ? 'Voice call' : 'Video call'}</div>
             </div>
-            <div className="ml-4 flex items-center gap-2">
-              <button onClick={() => { try { if (socket && socket.connected) socket.emit('call-accept', { to: incomingCall.from }) } catch (e) { console.warn(e) }; try { nav(`/call/${incomingCall.from}?mode=${incomingCall.mode || 'video'}`) } catch (e) { console.warn(e) }; setIncomingCall(null) }} className="w-10 h-10 bg-emerald-500 text-white rounded-full flex items-center justify-center">✅</button>
-              <button onClick={() => { try { if (socket && socket.connected) socket.emit('call-decline', { to: incomingCall.from }) } catch (e) { console.warn(e) }; setIncomingCall(null) }} className="w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center">✖️</button>
-            </div>
+              <div className="ml-4 flex items-center gap-2">
+                <button onClick={() => {
+                  try {
+                    // mark pending accept so Call page will emit accept once local media is ready
+                    try { localStorage.setItem('pendingCallAccept', incomingCall.from) } catch (err) { /* ignore */ }
+                    if (socket && socket.connected) socket.emit('call-accept', { to: incomingCall.from })
+                  } catch (e) { console.warn(e) }
+                  try { nav(`/call/${incomingCall.from}?mode=${incomingCall.mode || 'video'}`) } catch (e) { console.warn(e) }
+                  setIncomingCall(null)
+                }} className="w-10 h-10 bg-emerald-500 text-white rounded-full flex items-center justify-center">✅</button>
+                <button onClick={() => { try { if (socket && socket.connected) socket.emit('call-decline', { to: incomingCall.from }) } catch (e) { console.warn(e) } setIncomingCall(null) }} className="w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center">✖️</button>
+              </div>
           </div>
         </div>
       )}
