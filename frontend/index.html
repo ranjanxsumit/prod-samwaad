@@ -7,6 +7,21 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- runtime API URL injection: replace %%API_URL%% with your host's value or leave blank for same-origin -->
+    <script>
+      (function(){
+        try {
+          var injected = '%%API_URL%%';
+          if (injected && injected !== '%%API_URL%%') {
+            window.__API_URL = injected.replace(/\/$/, '')
+            console.log('runtime API URL injected', window.__API_URL)
+          } else {
+            // fallback to same origin (empty string means relative requests)
+            window.__API_URL = ''
+          }
+        } catch (e) { console.warn('failed to set runtime API URL', e) }
+      })()
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
