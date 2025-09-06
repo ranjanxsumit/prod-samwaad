@@ -100,22 +100,26 @@ const socketHandler = (io) => {
     socket.on('call-init', (data) => {
       // data: { to, mode }
       try {
-        socket.to(data.to).emit('incoming-call', { from: user._id.toString(), name: user.name, avatar: user.avatar, mode: data.mode || 'video' });
-      } catch (e) { console.error('call-init err', e.message) }
+        // use io.to so server targets the recipient room explicitly
+        io.to(String(data.to)).emit('incoming-call', { from: user._id.toString(), name: user.name, avatar: user.avatar, mode: data.mode || 'video', socketId: socket.id });
+        console.log('call-init forwarded from', user._id.toString(), 'to', data.to, 'socket', socket.id)
+      } catch (e) { console.error('call-init err', e && e.message) }
     })
 
     socket.on('call-accept', (data) => {
       // data: { to }
       try {
-        socket.to(data.to).emit('call-accepted', { from: user._id.toString() });
-      } catch (e) { console.error('call-accept err', e.message) }
+        io.to(String(data.to)).emit('call-accepted', { from: user._id.toString(), socketId: socket.id });
+        console.log('call-accept forwarded from', user._id.toString(), 'to', data.to)
+      } catch (e) { console.error('call-accept err', e && e.message) }
     })
 
     socket.on('call-decline', (data) => {
       // data: { to }
       try {
-        socket.to(data.to).emit('call-declined', { from: user._id.toString() });
-      } catch (e) { console.error('call-decline err', e.message) }
+        io.to(String(data.to)).emit('call-declined', { from: user._id.toString() });
+        console.log('call-decline forwarded from', user._id.toString(), 'to', data.to)
+      } catch (e) { console.error('call-decline err', e && e.message) }
     })
 
     // WebRTC signaling
