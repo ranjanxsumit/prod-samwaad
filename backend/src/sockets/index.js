@@ -102,12 +102,15 @@ const socketHandler = (io) => {
         const presences = await Presence.find({ userId: userId, online: true }).lean()
         const sent = new Set()
         if (presences && presences.length) {
+          const sids = []
           for (const p of presences) {
             if (p && p.socketId && !sent.has(p.socketId)) {
               try { io.to(p.socketId).emit(event, payload) } catch (e) { /* ignore per-socket emit errors */ }
               sent.add(p.socketId)
+              sids.push(p.socketId)
             }
           }
+          if (sids.length) console.log('forwardToUserId emitted', event, 'to socketIds', sids)
           return
         }
         // fallback: emit to room name (may be joined by sockets)

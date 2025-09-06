@@ -118,7 +118,12 @@ export default function Chat() {
       setOnlineUsers(normalized)
     })
 
-  socket.on('incoming-call', (data) => { try { setIncomingCall(data) } catch (e) { console.warn(e) } })
+  socket.on('incoming-call', (data) => {
+    try {
+      console.log('incoming-call received', data)
+      setIncomingCall(data)
+    } catch (e) { console.warn(e) }
+  })
 
     return () => {
       if (!socket) return
