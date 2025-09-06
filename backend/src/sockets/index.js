@@ -96,44 +96,89 @@ const socketHandler = (io) => {
       socket.to(data.to).emit('typing', { from: user._id.toString() });
     });
 
+    // helper: forward to all known socketIds for a userId; if none found, fallback to room emit
+    const forwardToUserId = async (userId, event, payload) => {
+      try {
+        const presences = await Presence.find({ userId: userId, online: true }).lean()
+        const sent = new Set()
+        if (presences && presences.length) {
+          for (const p of presences) {
+            if (p && p.socketId && !sent.has(p.socketId)) {
+              try { io.to(p.socketId).emit(event, payload) } catch (e) { /* ignore per-socket emit errors */ }
+              sent.add(p.socketId)
+            }
+          }
+          return
+        }
+        // fallback: emit to room name (may be joined by sockets)
+        try { io.to(String(userId)).emit(event, payload) } catch (e) { /* ignore */ }
+      } catch (err) {
+        console.error('forwardToUserId error', err && err.message)
+      }
+    }
+
+    // helper: emit to a target which may be a socketId or a userId
+    const emitToTarget = async (target, event, payload) => {
+      try {
+        // if target matches a known socketId, emit directly
+        const bySocket = await Presence.findOne({ socketId: target }).lean()
+        if (bySocket && bySocket.socketId) {
+          try { io.to(target).emit(event, payload); return } catch (e) { /* ignore */ }
+        }
+        // otherwise treat as userId and forward
+        await forwardToUserId(target, event, payload)
+      } catch (err) { console.error('emitToTarget error', err && err.message) }
+    }
+
     // call lifecycle signaling helpers
-    socket.on('call-init', (data) => {
+    socket.on('call-init', async (data) => {
       // data: { to, mode }
       try {
-        // use io.to so server targets the recipient room explicitly
-        io.to(String(data.to)).emit('incoming-call', { from: user._id.toString(), name: user.name, avatar: user.avatar, mode: data.mode || 'video', socketId: socket.id });
+        const payload = { from: user._id.toString(), name: user.name, avatar: user.avatar, mode: data.mode || 'video', socketId: socket.id }
+        await forwardToUserId(String(data.to), 'incoming-call', payload)
         console.log('call-init forwarded from', user._id.toString(), 'to', data.to, 'socket', socket.id)
       } catch (e) { console.error('call-init err', e && e.message) }
     })
 
-    socket.on('call-accept', (data) => {
+    socket.on('call-accept', async (data) => {
       // data: { to }
       try {
-        io.to(String(data.to)).emit('call-accepted', { from: user._id.toString(), socketId: socket.id });
+        const payload = { from: user._id.toString(), socketId: socket.id }
+        await emitToTarget(data.to, 'call-accepted', payload)
         console.log('call-accept forwarded from', user._id.toString(), 'to', data.to)
       } catch (e) { console.error('call-accept err', e && e.message) }
     })
 
-    socket.on('call-decline', (data) => {
+    socket.on('call-decline', async (data) => {
       // data: { to }
       try {
-        io.to(String(data.to)).emit('call-declined', { from: user._id.toString() });
+        const payload = { from: user._id.toString() }
+        await emitToTarget(data.to, 'call-declined', payload)
         console.log('call-decline forwarded from', user._id.toString(), 'to', data.to)
       } catch (e) { console.error('call-decline err', e && e.message) }
     })
 
     // WebRTC signaling
-    socket.on('signal-offer', (data) => {
+    socket.on('signal-offer', async (data) => {
       // data: { to, sdp }
-      socket.to(data.to).emit('signal-offer', { from: user._id.toString(), sdp: data.sdp });
+      try {
+        const payload = { from: user._id.toString(), sdp: data.sdp }
+        await emitToTarget(data.to, 'signal-offer', payload)
+      } catch (e) { console.error('signal-offer err', e && e.message) }
     });
 
-    socket.on('signal-answer', (data) => {
-      socket.to(data.to).emit('signal-answer', { from: user._id.toString(), sdp: data.sdp });
+    socket.on('signal-answer', async (data) => {
+      try {
+        const payload = { from: user._id.toString(), sdp: data.sdp }
+        await emitToTarget(data.to, 'signal-answer', payload)
+      } catch (e) { console.error('signal-answer err', e && e.message) }
     });
 
-    socket.on('signal-ice', (data) => {
-      socket.to(data.to).emit('signal-ice', { from: user._id.toString(), candidate: data.candidate });
+    socket.on('signal-ice', async (data) => {
+      try {
+        const payload = { from: user._id.toString(), candidate: data.candidate }
+        await emitToTarget(data.to, 'signal-ice', payload)
+      } catch (e) { console.error('signal-ice err', e && e.message) }
     });
 
     socket.on('disconnect', async () => {
