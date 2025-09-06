@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
 export default function Nav({ user, onLogout }) {
+  const navigate = useNavigate()
   const pillRef = useRef(null)
   const [tilt, setTilt] = useState({ x: 0, y: 0 })
   const rafRef = useRef(null)
@@ -145,7 +146,7 @@ export default function Nav({ user, onLogout }) {
                     <div className="text-xs text-gray-500">{user?.email}</div>
                   </div>
                   <div className="mt-3 px-4">
-                    <Link to="/profile" className="block text-sm text-indigo-600 hover:underline mb-2">View profile</Link>
+                    <button onClick={() => { setUserMenuOpen(false); navigate('/profile') }} className="block text-sm text-indigo-600 hover:underline mb-2 text-left">View profile</button>
                     <button onClick={() => { setUserMenuOpen(false); onLogout && onLogout() }} className="w-full text-left bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded">Logout</button>
                   </div>
                 </div>

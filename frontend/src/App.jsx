@@ -67,6 +67,8 @@ export default function App() {
           <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/call/:id" element={<ProtectedRoute><Call /></ProtectedRoute>} />
+          {/* Catch-all: redirect unknown client routes to home so SPA handles routing (prevents 404 on direct links) */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
       </SocketProvider>
