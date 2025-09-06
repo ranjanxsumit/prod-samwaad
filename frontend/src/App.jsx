@@ -8,7 +8,7 @@ import Call from './pages/Call'
 import { useDispatch, useSelector } from 'react-redux'
 import { clearAuth, setAuth } from './store/slices/authSlice'
 import { useEffect } from 'react'
-import Nav from './components/Nav'
+import HeaderSimple from './components/HeaderSimple'
 import { SocketProvider } from './contexts/SocketProvider'
 import { setToken, scheduleTokenExpiry, clearScheduledExpiry } from './utils/auth'
 import { Navigate } from 'react-router-dom'
@@ -58,7 +58,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Nav user={user} onLogout={logout} />
+  <HeaderSimple />
   <SocketProvider>
   <div className="p-4 sm:p-6 max-w-6xl mx-auto">
         <Routes>

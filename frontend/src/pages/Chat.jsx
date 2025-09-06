@@ -406,8 +406,8 @@ export default function Chat() {
 
         {/* Main chat */}
         <main className="col-span-12 md:col-span-8 lg:col-span-8 flex flex-col min-h-0" style={{ maxHeight: 'calc(100vh - 14rem)', margin: '1rem auto' }}>
-          {/* Header spacer (top bar is fixed) */}
-          <div className="h-20" />
+          {/* Header spacer for new header */}
+          <div className="h-16" />
 
           {/* Messages */}
           <div ref={scrollRef} className="flex-1 overflow-auto p-4 min-h-0" style={{ backgroundImage: 'radial-gradient(rgba(0,0,0,0.02) 1px, transparent 1px)', backgroundSize: '40px 40px' }}>

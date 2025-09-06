@@ -68,7 +68,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{ paddingTop: '7.5rem' }}>
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ paddingTop: '4.5rem' }}>
       <div className="max-w-md w-full mx-auto bg-white p-6 rounded shadow animate-fade-in">
         <h2 className="text-xl font-semibold mb-4">Profile</h2>
         <div className="space-y-3">

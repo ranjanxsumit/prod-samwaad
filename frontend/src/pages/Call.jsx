@@ -264,7 +264,7 @@ export default function Call() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ paddingTop: '6rem' }}>
+  <div className="min-h-screen flex items-center justify-center p-4" style={{ paddingTop: '4.5rem' }}>
       <div className="w-full max-w-4xl bg-white rounded shadow p-6">
         <h2 className="text-xl mb-4 text-center">Call with {id} ({mode})</h2>
         <div className="flex flex-col md:flex-row items-center md:items-stretch gap-4 justify-center">
