@@ -15,6 +15,7 @@ export default function Chat() {
   const [selectedUser, setSelectedUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem('selectedUser') || 'null') } catch (e) { return null }
   })
+  const selectedUserRef = useRef(selectedUser)
   const [messages, setMessages] = useState([])
   const [text, setText] = useState('')
   const [onlineUsers, setOnlineUsers] = useState([])
@@ -57,6 +58,9 @@ export default function Chat() {
   }
 
   useEffect(() => {
+    selectedUserRef.current = selectedUser
+  }, [selectedUser])
+  useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
 
@@ -78,7 +82,14 @@ export default function Chat() {
     if (!socket) return
 
     socket.on('message-received', ({ message }) => {
-      setMessages(m => (selectedUser && (String(message.from?.id) === String(selectedUser.userId) || String(message.to) === String(selectedUser.userId))) ? [...m, message] : m)
+      try {
+        const sel = selectedUserRef.current
+        const fromId = getId(message.from) || String(message.from || '')
+        const toId = getId(message.to) || String(message.to || '')
+        if (sel && (String(fromId) === String(sel.userId) || String(toId) === String(sel.userId))) {
+          setMessages(m => [...m, message])
+        }
+      } catch (e) { console.warn('message-received handler', e) }
     })
 
     socket.on('online-users', (list) => {
@@ -91,7 +102,7 @@ export default function Chat() {
       setOnlineUsers(normalized)
     })
 
-    socket.on('incoming-call', (data) => { try { setIncomingCall(data) } catch (e) { console.warn(e) } })
+  socket.on('incoming-call', (data) => { try { setIncomingCall(data) } catch (e) { console.warn(e) } })
 
     return () => {
       if (!socket) return
@@ -146,9 +157,13 @@ export default function Chat() {
         await axios.post('/api/messages', { to, text: text.trim() })
       }
     } catch (err) {
-      if (socket && socket.connected) socket.emit('send-message', { to, text: text.trim() })
+        // If server call fails, fallback to emitting via socket so recipient still receives it
+        if (socket && socket.connected) socket.emit('send-message', { to, text: text.trim() })
       setUploading(false)
     }
+
+    // Always emit over socket so server/recipient and this client receive live updates
+    try { if (socket && socket.connected) socket.emit('send-message', { to, text: text.trim() }) } catch (e) { /**/ }
 
     setText('')
     if (pendingImagePreview) try { URL.revokeObjectURL(pendingImagePreview) } catch (e) {}
@@ -220,9 +235,10 @@ export default function Chat() {
             </div>
           </div>
 
-          {/* Center top: selected user pill */}
-          <div className="absolute top-6 left-1/2 transform -translate-x-1/2 z-40 w-full max-w-3xl px-4">
-            <div className="inline-flex items-center justify-center gap-4 bg-white/95 backdrop-blur-sm text-gray-900 rounded-full px-4 py-2 shadow-md min-w-[280px] max-w-[720px] w-full">
+          {/* Right-aligned selected user pill (above chat box, doesn't cross left grey line) */}
+          <div className="absolute top-6 right-8 z-40 w-full max-w-md px-4 pointer-events-none">
+            <div className="pointer-events-auto flex justify-end">
+              <div className="inline-flex items-center gap-4 bg-white/95 backdrop-blur-sm text-gray-900 rounded-full px-4 py-2 shadow-md min-w-[200px] w-full">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden">
                   {selectedUser && normalizeAvatar(selectedUser.avatar) ? <img src={normalizeAvatar(selectedUser.avatar)} alt="avatar" className="w-full h-full object-cover" /> : (selectedUser && selectedUser.name ? selectedUser.name[0].toUpperCase() : 'U')}
@@ -232,6 +248,7 @@ export default function Chat() {
               <div className="ml-auto flex items-center gap-2 flex-shrink-0">
                 <button title="Video call" onClick={() => { if (!selectedUser) return; try { nav(`/call/${selectedUser.userId}?mode=video`) } catch (e) {} }} className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">📹</button>
                 <button title="Voice call" onClick={() => { if (!selectedUser) return; try { nav(`/call/${selectedUser.userId}?mode=audio`) } catch (e) {} }} className="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center">📞</button>
+              </div>
               </div>
             </div>
           </div>
