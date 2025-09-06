@@ -121,7 +121,7 @@ export default function Nav({ user, onLogout }) {
             <div className="relative hidden sm:block">
               <button
                 type="button"
-                onClick={() => setUserMenuOpen(s => !s)}
+                onClick={(e) => { e.stopPropagation(); setUserMenuOpen(s => !s) }}
                 aria-haspopup="menu"
                 aria-expanded={userMenuOpen}
                 title="Profile"
