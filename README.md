@@ -169,14 +169,6 @@ node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 - E2E encryption layer (insertable streams / Double Ratchet)
 - Better bandwidth & network quality stats overlay
 
-## Scripts (Root Convenience)
-Optionally add root scripts (not included yet) to run both servers via `concurrently`.
-
-## License
-Proprietary / All rights reserved (adjust if you plan OSS release).
-
----
-Generated fresh after history purge: this README replaces prior internal documentation.
 
 
 
