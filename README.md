@@ -127,6 +127,28 @@ Output in `frontend/dist` (can be served via CDN / static host or reverse proxie
 - Validate all socket events (server should verify authenticated user - ensure auth middleware wraps Socket.IO connection)
 - Never commit `.env` or secrets (purged history in this revision)
 
+### Secret Leak Remediation (Performed)
+Earlier history contained a committed `.env.example` with real credentials (MongoDB user, Cloudinary URL, JWT secret). A new clean history was built and force pushed. Actions you still MUST perform externally:
+1. Rotate MongoDB user password (or delete and recreate the compromised DB user) in Atlas.
+2. Invalidate any connection strings embedded in deployment platforms (update environment variables to new URI).
+3. Rotate Cloudinary API key/secret (Dashboard: Security → Regenerate) and update backend `.env`.
+4. Change `JWT_SECRET` to a new long random string (32+ bytes). All existing tokens will become invalid (forces re-auth).
+5. Redeploy backend with new env values.
+6. Verify no lingering build artifacts or logs contain old secrets.
+
+### Generating Strong Secrets
+Use PowerShell or Node:
+```powershell
+node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
+```
+
+### Recommended Hardening
+- Use dedicated least-privilege MongoDB user per environment.
+- Enable IP allowlist / VPC peering for MongoDB Atlas.
+- Add rate limiting & audit logging for auth endpoints.
+- Consider moving secrets to a manager (Vault, Doppler, AWS Secrets Manager, Render native secrets).
+- Add a pre-commit hook (e.g. `git-secrets`, `detect-secrets`) to block accidental commits.
+
 ## Roadmap / Possible Enhancements
 - Group calls (multi-peer mesh or SFU integration)
 - Screen sharing
