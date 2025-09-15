@@ -2,6 +2,18 @@
 
 Samwaad is a full‑stack real‑time communication app featuring secure authentication, 1:1 messaging, presence, and WebRTC audio/video calling with a polished animated call UI.
 
+<img width="1390" height="691" alt="image" src="https://github.com/user-attachments/assets/a20c4a85-b2d8-4a3b-9eb2-c395dbb29cc9" />
+
+
+<img width="1494" height="895" alt="image" src="https://github.com/user-attachments/assets/0686a771-924a-4345-a24b-4b0c3d90436e" />
+
+<img width="1386" height="867" alt="image" src="https://github.com/user-attachments/assets/6a3f4341-4681-4cf3-96d4-bea3f771135f" />
+
+<img width="1453" height="266" alt="image" src="https://github.com/user-attachments/assets/91d0e65f-f2f6-4562-bcbc-d1f93f340bda" />
+
+<img width="1443" height="761" alt="image" src="https://github.com/user-attachments/assets/fc5f12bc-aa98-4889-9635-6697dbb644ec" />
+
+
 ## Features
 
 ### Core Messaging
